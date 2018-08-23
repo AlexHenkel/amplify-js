@@ -152,7 +152,7 @@ export default class StorageClass {
         if (!credentialsOK) { return Promise.reject('No credentials'); }
 
         const opt = Object.assign({}, this._options, options);
-        const { bucket, region, credentials, level, track } = opt;
+        const { bucket, region, credentials, level, track, acl } = opt;
         const { contentType, contentDisposition, cacheControl, expires, metadata } = opt;
         const type = contentType ? contentType : 'binary/octet-stream';
 
@@ -165,8 +165,9 @@ export default class StorageClass {
             Bucket: bucket,
             Key: final_key,
             Body: object,
-            ContentType: type
+            ContentType: type,
         };
+        if (acl) { params.ACL = acl; }
         if (cacheControl) { params.CacheControl = cacheControl; }
         if (contentDisposition) { params.ContentDisposition = contentDisposition; }
         if (expires) { params.Expires = expires; }
