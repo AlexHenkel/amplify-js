@@ -414,6 +414,30 @@ describe('Storage', () => {
             curCredSpyOn.mockClear();
         });
 
+        test('put object with acl specified', async () => {
+            const curCredSpyOn = jest.spyOn(Credentials, 'get')
+                .mockImplementationOnce(() => {
+                    return new Promise((res, rej) => {
+                        res({});
+                    });
+                });
+
+            const storage = new Storage(options);
+            const spyon = jest.spyOn(S3.prototype, 'upload');
+
+            expect.assertions(2);
+            expect(await storage.put('key', 'obejct', { acl: 'public-read' })).toEqual({ "key": "path/itemsKey" });
+            expect(spyon.mock.calls[0][0]).toEqual({
+                "Body": "obejct",
+                "Bucket": "bucket",
+                "ContentType": "binary/octet-stream",
+                "Key": "public/key",
+                "ACL": "public-read"
+            });
+            spyon.mockClear();
+            curCredSpyOn.mockClear();
+        });
+
         test('credentials not ok', async () => {
             const curCredSpyOn = jest.spyOn(Credentials, 'get')
                 .mockImplementationOnce(() => {
